@@ -1,0 +1,18 @@
+name: "Amber to Masked Env"
+description: "Propagate Amber env to masked github action env"
+inputs:
+  amber-version:
+    description: "A valid NPM-style semver specification.	"
+    required: false
+    default: "*"
+runs:
+  using: "composite"
+  steps:
+    - uses: psibi/setup-amber@v2.0.0
+      with:
+        amber-version: ${{ inputs.amber-version }}
+    - name: Propagate Amber Env
+      run: |
+        amber print | sed 's/"//g' | sed 's/export.*=/::add-mask::/g'
+        amber print | sed 's/"//g' | sed 's/export //g' >> "$GITHUB_ENV"
+      shell: bash
